@@ -1,5 +1,7 @@
 "use client"
 
+import { useAuth } from "@/providers/auth-provider"
+
 import {
   Avatar,
   AvatarFallback,
@@ -23,6 +25,8 @@ import {
 import { ChevronsUpDownIcon, SparklesIcon, BadgeCheckIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
 
 export function NavUser({
+
+  
   user,
 }: {
   user: {
@@ -31,6 +35,7 @@ export function NavUser({
     avatar: string
   }
 }) {
+  const { session, signInWithPassword, signOut, signUpWithPassword, profile, role} = useAuth()
   const { isMobile } = useSidebar()
 
   return (

@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
+import { NavUserLoggedOut } from "@/components/sidebar/loggedout/nav-user-logged-out";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
+import { useAuth } from "@/providers/auth-provider";
 
 // This is sample data.
 const data = {
@@ -163,35 +165,58 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const {
+    session,
+    signInWithPassword,
+    signOut,
+    signUpWithPassword,
+    profile,
+    role,
+  } = useAuth();
   const { theme, setTheme } = useTheme();
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        {profile && <TeamSwitcher teams={data.teams} />}
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        {profile && (
+          <>
+            <NavMain items={data.navMain} />
+            <NavProjects projects={data.projects} />
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenuItem>
-          {
-            /* theme toggle */
-            theme === "light" ? (
-          <SidebarMenuButton onClick={()=>setTheme("dark")} className="text-sidebar-foreground">
-            <Moon className="text-sidebar-foreground/70" />
-            <span>Dark</span>
+        {theme === "light" ? (
+          <SidebarMenuButton
+            // size="lg"
+            onClick={() => setTheme("dark")}
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          >
+            <Moon />
+            <div className="grid flex-1 text-start text-sm leading-tight">
+              <span className="truncate text-xs">Dark Mode</span>
+            </div>
           </SidebarMenuButton>
-            ) : (
-          <SidebarMenuButton onClick={()=>setTheme("light")} className="text-sidebar-foreground">
-            <Sun className="text-sidebar-foreground/70" />
-            <span>Light</span>
+        ) : (
+          <SidebarMenuButton
+            // size="lg"
+            onClick={() => setTheme("light")}
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          >
+            <Sun />
+            <div className="grid flex-1 text-start text-sm leading-tight">
+              <span className="truncate text-xs">Light Mode</span>
+            </div>
           </SidebarMenuButton>
-            )
-          }
-        </SidebarMenuItem>
-        <NavUser user={data.user} />
+        )}
+        {profile ? (
+          <NavUser user={data.user} />
+        ) : (
+          <NavUserLoggedOut user={data.user} />
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
