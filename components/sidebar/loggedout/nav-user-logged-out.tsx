@@ -37,6 +37,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import LoginDialog from "@/components/dialog/login";
+import SignUpDialog from "@/components/dialog/signup";
 
 export function NavUserLoggedOut({
   user,
@@ -86,50 +87,8 @@ export function NavUserLoggedOut({
               </div>
             </SidebarMenuButton>
           </DialogTrigger>
-          <DialogContent>
-            <DialogTitle>Sign Up Form</DialogTitle>
-            <DialogDescription>
-              This is where the login/signup form will go. You can create a
-              separate component for the form and include it here.
-            </DialogDescription>
-          </DialogContent>
+          <SignUpDialog/>
         </Dialog>
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                <LogIn />
-                <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    User Not Logged In
-                  </span>
-                  <span className="truncate text-xs">Login/Signup</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <LogIn />
-                Login
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserPlus />
-                Sign Up
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
       </SidebarMenuItem>
     </SidebarMenu>
   );

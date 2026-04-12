@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
+import { NavUser } from "@/components/sidebar/loggedin/nav-user";
 import { NavUserLoggedOut } from "@/components/sidebar/loggedout/nav-user-logged-out";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -167,14 +167,14 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {
     session,
-    signInWithPassword,
-    signOut,
-    signUpWithPassword,
+    isLoading,
     profile,
     role,
   } = useAuth();
   const { theme, setTheme } = useTheme();
-
+  if (isLoading) {
+    return null;
+  }
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

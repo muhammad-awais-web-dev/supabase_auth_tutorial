@@ -35,7 +35,7 @@ export function NavUser({
     avatar: string
   }
 }) {
-  const { session, signInWithPassword, signOut, signUpWithPassword, profile, role} = useAuth()
+  const { session, signOut, profile, role} = useAuth()
   const { isMobile } = useSidebar()
 
   return (
@@ -52,8 +52,8 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">{profile?.display_name || profile?.username}</span>
+                <span className="truncate text-xs">{session?.user?.email}</span>
               </div>
               <ChevronsUpDownIcon className="ms-auto size-4" />
             </SidebarMenuButton>

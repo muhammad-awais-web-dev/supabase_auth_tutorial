@@ -12,6 +12,22 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import type { Tables } from "@/types/database.types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+  FieldTitle,
+  Field,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Profile = Tables<"profiles">;
 type Role = Tables<"user_roles">["role"];
@@ -23,8 +39,14 @@ type AuthContextValue = {
   role: Role | null;
   isLoading: boolean;
   refreshSession: () => Promise<void>;
-  signInWithPassword: (email: string, password: string) => ReturnType<typeof supabase.auth.signInWithPassword>;
-  signUpWithPassword: (email: string, password: string) => ReturnType<typeof supabase.auth.signUp>;
+  signInWithPassword: (
+    email: string,
+    password: string,
+  ) => ReturnType<typeof supabase.auth.signInWithPassword>;
+  signUpWithPassword: (
+    email: string,
+    password: string,
+  ) => ReturnType<typeof supabase.auth.signUp>;
   signOut: () => Promise<void>;
 };
 
@@ -37,6 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [userNameError, setUserNameError] = useState<string | null>(null);
 
   const hydrateAuthData = useCallback(async (nextSession: Session | null) => {
     setSession(nextSession);
@@ -103,6 +128,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRole(null);
   }, []);
 
+  const updateProfile = async (updatedProfile: Partial<Profile>) => {
+    if (!session) return;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(updatedProfile)
+      .eq("id", session.user.id)
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error updating profile:", error);
+      return;
+    }
+    setProfile(data);
+  };
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user: session?.user ?? null,
@@ -124,10 +166,93 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithPassword,
       signOut,
       signUpWithPassword,
-    ]
+    ],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+
+  const handleUsernameSet = async (e:React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!profile?.id) return;
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ username: userName, display_name: displayName })
+      .eq("id", profile.id)
+      .select()
+      .maybeSingle();
+    if (error) {
+      console.error("Error setting username:", error);
+      if (error.code === "23505") {
+        setUserNameError("Username already taken. Please choose another.");
+      } else {
+        setUserNameError("An error occurred while setting the username. Please try again.");
+      }
+      return;
+    }
+    if (data){
+
+      setProfile(data);
+    }
+  }
+
+  useEffect(() =>{
+    if (userNameError === null) return;
+    const timer = setTimeout(() => {
+      setUserNameError(null);
+    }, 5000);
+    return () => clearTimeout(timer);
+  },[userNameError])
+
+  return (
+    <AuthContext.Provider value={value}>
+      {profile?.id && (
+        <Dialog open={profile?.username === null}>
+            <DialogContent>
+          <form onSubmit={handleUsernameSet} className=" px-5 gap-5 flex flex-col ">
+              <DialogTitle className=" text-lg font-bold ">
+                Set Username
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                You dont seem to have a username set. Please set your username
+                to continue.
+              </DialogDescription>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel>Username*</FieldLabel>
+                  <FieldError>{userNameError}</FieldError>
+                  <FieldError />
+                  <Input
+                    required
+                    type="text"
+                    placeholder="Enter your username"
+                    value={userName || ""}
+                    onChange={(e) =>
+                      setUserName(e.target.value)
+                    }
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Display Name (Optional)</FieldLabel>
+                  <FieldError />
+                  <Input
+                    type="text"
+                    placeholder="Enter your display name"
+                    value={displayName || ""}
+                    onChange={(e) =>
+                      setDisplayName(e.target.value)
+                    }
+                  />
+                </Field>
+              </FieldGroup>
+              <Button type="submit" className="w-full">
+                Update Profile
+              </Button>
+          </form>
+            </DialogContent>
+        </Dialog>
+      )}
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
