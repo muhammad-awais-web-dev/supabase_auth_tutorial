@@ -10,7 +10,7 @@ export default function Page() {
   const [mode, setMode] = useState("Login")
 
   return (
-    <main>
-    </main>
+    <div>
+    </div>
   );
 }
