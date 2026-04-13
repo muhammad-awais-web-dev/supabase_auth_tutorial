@@ -17,8 +17,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { MoreHorizontalIcon, FolderIcon, ArrowRightIcon, Trash2Icon } from "lucide-react"
+import type { Database } from "@/types/supabase"
+import { useEffect, useState } from "react"
+import { createClient } from "@/utils/supabase/client"
+import Link from "next/link"
+
 
 export function NavProjects({
+
+  
   projects,
 }: {
   projects: {
@@ -27,19 +34,36 @@ export function NavProjects({
     icon: React.ReactNode
   }[]
 }) {
+  type Projects = Database["public"]["Views"]["project_details_with_managers"]["Row"][]
   const { isMobile } = useSidebar()
+  const [projectsData, setProjectsData] = useState<Projects>([])
+
+  useEffect(()=>{
+    const supabase = createClient()
+    const fetchProjects = async () => {
+      const { data, error } = await supabase
+        .from("project_details_with_managers")
+        .select("*")
+      if (error) {
+        console.error("Error fetching projects:", error)
+      } else {
+        setProjectsData(data)
+        console.log("Fetched projects:", data)
+      }
+    }
+    fetchProjects()
+  }, [])
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {projectsData.map((item) => (
+          <SidebarMenuItem key={item.project_name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
-                {item.icon}
-                <span>{item.name}</span>
-              </a>
+              <Link href={`/project/${item.project_id}`} className="flex items-center gap-2">
+                <span className="text-sm" >{item.project_name}<span className=" text-foreground/50 text-xs " > - {item.manager_display_name || item.manager_username || "No Manager"}</span></span>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

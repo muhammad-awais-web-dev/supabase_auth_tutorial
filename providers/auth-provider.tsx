@@ -78,7 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("id", userId).maybeSingle(),
     ]);
-
+    if (profileData.avatar_url===null) {
+      profileData.avatar_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.display_name || profileData.username || "User")}&background=random&color=fff`;
+    }
     setProfile(profileData ?? null);
     setRole(roleData?.role ?? null);
     setIsLoading(false);
@@ -169,8 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ],
   );
 
-
-  const handleUsernameSet = async (e:React.SubmitEvent<HTMLFormElement>) => {
+  const handleUsernameSet = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!profile?.id) return;
     const { data, error } = await supabase
@@ -184,30 +185,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error.code === "23505") {
         setUserNameError("Username already taken. Please choose another.");
       } else {
-        setUserNameError("An error occurred while setting the username. Please try again.");
+        setUserNameError(
+          "An error occurred while setting the username. Please try again.",
+        );
       }
       return;
     }
-    if (data){
-
+    if (data) {
       setProfile(data);
     }
-  }
+  };
 
-  useEffect(() =>{
+  useEffect(() => {
     if (userNameError === null) return;
     const timer = setTimeout(() => {
       setUserNameError(null);
     }, 5000);
     return () => clearTimeout(timer);
-  },[userNameError])
+  }, [userNameError]);
 
   return (
     <AuthContext.Provider value={value}>
       {profile?.id && (
         <Dialog open={profile?.username === null}>
-            <DialogContent>
-          <form onSubmit={handleUsernameSet} className=" px-5 gap-5 flex flex-col ">
+          <DialogContent>
+            <form
+              onSubmit={handleUsernameSet}
+              className=" px-5 gap-5 flex flex-col "
+            >
               <DialogTitle className=" text-lg font-bold ">
                 Set Username
               </DialogTitle>
@@ -225,9 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     type="text"
                     placeholder="Enter your username"
                     value={userName || ""}
-                    onChange={(e) =>
-                      setUserName(e.target.value)
-                    }
+                    onChange={(e) => setUserName(e.target.value)}
                   />
                 </Field>
                 <Field>
@@ -237,17 +240,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     type="text"
                     placeholder="Enter your display name"
                     value={displayName || ""}
-                    onChange={(e) =>
-                      setDisplayName(e.target.value)
-                    }
+                    onChange={(e) => setDisplayName(e.target.value)}
                   />
                 </Field>
               </FieldGroup>
               <Button type="submit" className="w-full">
                 Update Profile
               </Button>
-          </form>
-            </DialogContent>
+            </form>
+          </DialogContent>
         </Dialog>
       )}
       {children}

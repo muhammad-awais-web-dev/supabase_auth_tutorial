@@ -1,3 +1,5 @@
+"use server";
+
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -8,4 +10,3 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 export const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
-

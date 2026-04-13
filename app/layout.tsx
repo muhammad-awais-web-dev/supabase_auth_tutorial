@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/providers/auth-provider";
+import { ProjectsProvider } from "@/providers/project-provider";
 
 const outfitHeading = Outfit({
   subsets: ["latin"],
@@ -49,24 +50,29 @@ export default function RootLayout({
         outfitHeading.variable,
       )}
     >
-      <body suppressHydrationWarning className="min-h-full w-full flex flex-col">
+      <body
+        suppressHydrationWarning
+        className="min-h-full w-full flex flex-col"
+      >
         <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TooltipProvider delayDuration={0}>
-              <SidebarProvider>
-                <AppSidebar />
-                <main className=" bg-background w-full h-screen flex flex-col ">
-                  <SidebarTrigger size={"icon-lg"} />
-                  {children}
-                </main>
-              </SidebarProvider>
-            </TooltipProvider>
-          </ThemeProvider>
+          <ProjectsProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <TooltipProvider delayDuration={0}>
+                <SidebarProvider>
+                  <AppSidebar />
+                  <main className=" bg-background w-full h-screen flex flex-col ">
+                    <SidebarTrigger size={"icon-lg"} />
+                    {children}
+                  </main>
+                </SidebarProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+          </ProjectsProvider>
         </AuthProvider>
       </body>
     </html>
