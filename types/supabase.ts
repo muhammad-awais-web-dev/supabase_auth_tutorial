@@ -95,6 +95,7 @@ export type Database = {
       }
       project_tasks: {
         Row: {
+          created_at: string | null
           id: string
           project_id: string
           status: string
@@ -102,6 +103,7 @@ export type Database = {
           task_title: string
         }
         Insert: {
+          created_at?: string | null
           id?: string
           project_id: string
           status?: string
@@ -109,6 +111,7 @@ export type Database = {
           task_title: string
         }
         Update: {
+          created_at?: string | null
           id?: string
           project_id?: string
           status?: string

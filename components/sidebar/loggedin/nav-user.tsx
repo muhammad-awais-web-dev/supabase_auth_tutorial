@@ -26,15 +26,13 @@ import {
   BellIcon,
   LogOutIcon,
   User,
+  FlaskRoundIcon,
 } from "lucide-react";
 import ManageProfile from "@/components/dialog/manage-profile";
 import { Dialog } from "@/components/ui/dialog";
 import { useState } from "react";
 
 export function NavUser({
-
-
-  
   user,
 }: {
   user: {
@@ -114,26 +112,12 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={()=>setProfileDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
                 <User />
                 Profile
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheckIcon />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => signOut()}>
               <LogOutIcon />

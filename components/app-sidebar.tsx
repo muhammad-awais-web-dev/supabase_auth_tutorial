@@ -31,8 +31,10 @@ import {
   MapIcon,
   Moon,
   Sun,
+  FlaskConical,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
+import DevelopmentDialog from "./development/development-dialog";
 
 // This is sample data.
 const data = {
@@ -165,12 +167,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const {
-    session,
-    isLoading,
-    profile,
-    role,
-  } = useAuth();
+  const { session, isLoading, profile, role } = useAuth();
   const { theme, setTheme } = useTheme();
   if (isLoading) {
     return null;
@@ -211,6 +208,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <span className="truncate text-xs">Light Mode</span>
             </div>
           </SidebarMenuButton>
+        )}{" "}
+        {process.env.NEXT_PUBLIC_ENVIROMENT === "development" && (
+          <DevelopmentDialog>
+            <SidebarMenuButton>
+              <FlaskConical />
+              <div className="grid flex-1 text-start text-sm leading-tight">
+                <span className="truncate text-xs">Development Tools</span>
+              </div>
+            </SidebarMenuButton>
+          </DevelopmentDialog>
         )}
         {profile ? (
           <NavUser user={data.user} />
