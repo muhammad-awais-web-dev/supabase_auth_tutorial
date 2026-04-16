@@ -80,10 +80,6 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
             ),
           );
           setProjectMembers(usersInLoggedInMemberOfProjects);
-          console.log(
-            "Project members for logged in user:",
-            usersInLoggedInMemberOfProjects,
-          );
         }
         setIsLoading(false);
       });
@@ -102,7 +98,6 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
         if (error) {
           console.error("Error fetching project tasks:", error);
         } else {
-          console.log("Project tasks for logged in user:", data);
           setProjectTasks(data);
         }
         setIsLoading(false);

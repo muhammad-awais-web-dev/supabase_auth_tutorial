@@ -19,7 +19,6 @@ const DevelopmentDialog = ({ children }: { children: React.ReactNode }) => {
   const handleCreateUsers = async () => {
     try {
       const createdUserIds = await createUsers();
-      console.log("Created user IDs:", createdUserIds);
     } catch (error) {
       console.error("Error creating users:", error);
     }

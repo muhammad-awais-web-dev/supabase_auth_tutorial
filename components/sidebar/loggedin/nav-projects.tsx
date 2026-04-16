@@ -48,7 +48,6 @@ export function NavProjects({
         console.error("Error fetching projects:", error)
       } else {
         setProjectsData(data)
-        console.log("Fetched projects:", data)
       }
     }
     fetchProjects()

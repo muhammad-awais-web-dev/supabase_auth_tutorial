@@ -4,8 +4,8 @@ import { supabaseAdmin } from "@/utils/supabase/adminClient";
 
 const createUsers = async () => {
   const userEmail = `user-${Date.now()}@example.com`;
-  // console.log("Creating user with email:", userEmail);
-  // console.log("Password: password123");
+  // "Creating user with email:", userEmail
+  // "Password: password123"
 
   const { data: user, error } = await supabaseAdmin.auth.admin.createUser({
     email: userEmail,
