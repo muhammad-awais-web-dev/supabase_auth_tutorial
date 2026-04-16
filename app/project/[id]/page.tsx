@@ -16,6 +16,7 @@ import {
   ChevronRightIcon,
   CircleCheckBig,
   Construction,
+  Edit2,
   Hourglass,
   OctagonX,
   Plus,
@@ -41,6 +42,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 import AddTaskDialog from "./components/AddTaskDialog";
+import EditMembers from "./components/EditMembers";
 
 const page = () => {
   const { id } = useParams();
@@ -422,13 +424,7 @@ const page = () => {
             {projects?.filter((member) => member.project_id === id)[0]
               .manager_username === profile?.username ? (
               <CardAction>
-                <Button
-                  variant={"outline"}
-                  size={"icon-lg"}
-                  className=" hover:bg-primary/10 cursor-pointer "
-                >
-                  <Plus />
-                </Button>
+                <EditMembers />
               </CardAction>
             ) : null}
             <CardTitle className=" text-lg font-semibold  ">
