@@ -16,10 +16,8 @@ import {
   ChevronRightIcon,
   CircleCheckBig,
   Construction,
-  Edit2,
   Hourglass,
   OctagonX,
-  Plus,
   Trash2,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
@@ -30,19 +28,13 @@ import {
 } from "@/components/ui/collapsible";
 
 import { createClient } from "@/utils/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import type { Database } from "@/types/supabase";
 
 import AddTaskDialog from "./components/AddTaskDialog";
 import EditMembers from "./components/EditMembers";
+
+type ProjectTaskRow = Database["public"]["Tables"]["project_tasks"]["Row"];
+const TASK_DELETE_HIGHLIGHT_MS = 500;
 
 const page = () => {
   const { id } = useParams();
@@ -93,6 +85,8 @@ const page = () => {
   ];
 
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
+  const [localProjectTasks, setLocalProjectTasks] =
+    useState<ProjectTaskRow[] | null>(projectTasks);
   const [localStatusByTaskId, setLocalStatusByTaskId] = useState<
     Record<string, string>
   >({});
@@ -106,19 +100,68 @@ const page = () => {
     null,
   );
 
+  useEffect(() => {
+    setLocalProjectTasks(projectTasks);
+  }, [projectTasks]);
+
+  const scrollToTaskCard = (taskId: string) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const taskCard = document.getElementById(`task-card-${taskId}`);
+        taskCard?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
+    });
+  };
+
+  const highlightTask = (taskId: string, status: string) => {
+    setHighlightedTaskId(taskId);
+    setHighlightedTaskStatus(status);
+
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+
+    highlightTimeoutRef.current = setTimeout(() => {
+      setHighlightedTaskId(null);
+      setHighlightedTaskStatus(null);
+    }, 1500);
+  };
+
+  const handleTaskAdded = (task: ProjectTaskRow) => {
+    setLocalProjectTasks((prevTasks) =>
+      prevTasks ? prevTasks.concat(task) : [task],
+    );
+    setLocalStatusByTaskId((prev) => ({ ...prev, [task.id]: task.status }));
+    highlightTask(task.id, task.status);
+    scrollToTaskCard(task.id);
+  };
+
   const handleTaskDelete = async (taskId: string) => {
-      const { error,data } = await supabase
-        .from("project_tasks")
-        .delete()
-        .eq("id", taskId)
-      if (error) {
-        console.error("Error deleting task:", error);
-        return;
-      }
-      else{
-        refreshProjectTasks();
-      }
-  }
+    highlightTask(taskId, "cancelled");
+    scrollToTaskCard(taskId);
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, TASK_DELETE_HIGHLIGHT_MS);
+    });
+
+    setLocalProjectTasks(
+      (prevTasks) => prevTasks?.filter((task) => task.id !== taskId) || null,
+    );
+
+    const { error } = await supabase
+      .from("project_tasks")
+      .delete()
+      .eq("id", taskId);
+
+    if (error) {
+      console.error("Error deleting task:", error);
+    }
+
+    refreshProjectTasks();
+  };
 
   useEffect(() => {
     return () => {
@@ -131,33 +174,14 @@ const page = () => {
   const handleTaskUpdate = async (taskId: string, newStatus: string) => {
     const previousStatus =
       localStatusByTaskId[taskId] ||
-      projectTasks?.find((task) => task.id === taskId)?.status ||
+      localProjectTasks?.find((task) => task.id === taskId)?.status ||
       "pending";
 
     // Optimistic update so the UI re-sorts immediately.
     setLocalStatusByTaskId((prev) => ({ ...prev, [taskId]: newStatus }));
     setOpenTaskId(null);
-    setHighlightedTaskId(taskId);
-    setHighlightedTaskStatus(newStatus);
-
-    if (highlightTimeoutRef.current) {
-      clearTimeout(highlightTimeoutRef.current);
-    }
-
-    highlightTimeoutRef.current = setTimeout(() => {
-      setHighlightedTaskId(null);
-      setHighlightedTaskStatus(null);
-    }, 1500);
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const updatedTaskCard = document.getElementById(`task-card-${taskId}`);
-        updatedTaskCard?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      });
-    });
+    highlightTask(taskId, newStatus);
+    scrollToTaskCard(taskId);
 
     const { error } = await supabase
       .from("project_tasks")
@@ -232,7 +256,7 @@ const page = () => {
                 </div>
                 <span className={`text-sm text-${status.color}`}>
                   {status.label}{" "}
-                  {projectTasks
+                  {localProjectTasks
                     ?.filter((task) => task.project_id === id)
                     .filter((task) => task.status === status.key).length || 0}
                 </span>
@@ -247,16 +271,16 @@ const page = () => {
             {projects?.filter((member) => member.project_id === id)[0]
               .manager_username === profile?.username ? (
               <CardAction>
-                <AddTaskDialog />
+                <AddTaskDialog onTaskAdded={handleTaskAdded} />
               </CardAction>
             ) : null}
             <CardTitle className=" text-lg font-semibold  ">
               Project Tasks:
             </CardTitle>
           </CardHeader>
-          {projectTasks?.filter((task) => task.project_id === id)?.length ===
+          {localProjectTasks?.filter((task) => task.project_id === id)?.length ===
             0 && <span>No tasks in this project.</span>}
-          {projectTasks
+          {localProjectTasks
             ?.filter((task) => task.project_id === id)
             .sort((a, b) => {
               const statusOrder: { [key: string]: number } = {

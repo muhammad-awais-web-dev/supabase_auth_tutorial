@@ -17,8 +17,13 @@ import { createClient } from "@/utils/supabase/client";
 import { useParams } from "next/navigation";
 import { useProjects } from "@/providers/project-provider";
 import { Plus } from "lucide-react";
+import type { Database } from "@/types/supabase";
 
-const AddTaskDialog = () => {
+type AddTaskDialogProps = {
+  onTaskAdded?: (task: Database["public"]["Tables"]["project_tasks"]["Row"]) => void;
+};
+
+const AddTaskDialog = ({ onTaskAdded }: AddTaskDialogProps) => {
   const { id } = useParams();
 
   const [title, settitle] = useState<string>("");
@@ -49,19 +54,24 @@ const AddTaskDialog = () => {
     event.preventDefault();
     const supabase = createClient();
 
+    if (typeof id !== "string") {
+      return;
+    }
+
     const { data, error } = await supabase
       .from("project_tasks")
       .insert({
         task_title: title,
         task_description: description,
         status,
-        project_id: id, // Replace with actual project ID
+        project_id: id,
       })
       .select("*")
       .single();
     if (error) {
       console.error("Error inserting task:", error);
     } else {
+      onTaskAdded?.(data);
       setDialogOpen(false);
       settitle("");
       setdescription("");
