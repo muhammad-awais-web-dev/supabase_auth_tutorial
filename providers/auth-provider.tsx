@@ -147,6 +147,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(data);
   };
 
+  useEffect(() => {
+    if (!session?.user.id) return;
+
+    const channel = supabase.channel("project_room", {
+      config: {
+        presence: {
+          key: session.user.id,
+        },
+      },
+    });
+
+    channel
+      .on("presence", { event: "sync" }, () => {
+        const state = channel.presenceState();
+        const onlineUserIds = Object.keys(state);
+
+        if (process.env.NODE_ENV === "development") {
+          console.log("Currently Online IDs:", onlineUserIds);
+        }
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [session?.user.id]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user: session?.user ?? null,
