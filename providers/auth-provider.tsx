@@ -48,6 +48,7 @@ type AuthContextValue = {
     password: string,
   ) => ReturnType<typeof supabase.auth.signUp>;
   signOut: () => Promise<void>;
+  signedInUsers?: string[]; // Array of online user IDs
 };
 
 const supabase = createClient();
@@ -62,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userName, setUserName] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [userNameError, setUserNameError] = useState<string | null>(null);
+  const [signedInUsers, setSignedInUsers] = useState<string[]>([]);
 
   const hydrateAuthData = useCallback(async (nextSession: Session | null) => {
     setSession(nextSession);
@@ -147,36 +149,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(data);
   };
 
-  useEffect(() => {
-    if (!session?.user.id) return;
-
-    const channel = supabase.channel("project_room", {
-      config: {
-        presence: {
-          key: session.user.id,
-        },
-      },
-    });
-
-    channel
-      .on("presence", { event: "sync" }, () => {
-        const state = channel.presenceState();
-        const onlineUserIds = Object.keys(state);
-
-        if (process.env.NODE_ENV === "development") {
-          console.log("Currently Online IDs:", onlineUserIds);
-        }
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({ online_at: new Date().toISOString() });
-        }
-      });
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [session?.user.id]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -189,6 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithPassword,
       signUpWithPassword,
       signOut,
+      signedInUsers,
     }),
     [
       isLoading,
@@ -199,6 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithPassword,
       signOut,
       signUpWithPassword,
+      signedInUsers,
     ],
   );
 
@@ -234,6 +208,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 5000);
     return () => clearTimeout(timer);
   }, [userNameError]);
+
+///// Presence channel to track online users
+  useEffect(() => {
+    if (!session?.user.id) return;
+
+    const channel = supabase.channel("project_room", {
+      config: {
+        presence: {
+          key: session.user.id,
+        },
+      },
+    });
+
+    channel
+      .on("presence", { event: "sync" }, () => {
+        const state = channel.presenceState();
+        const onlineUserIds = Object.keys(state);
+
+        if (process.env.NODE_ENV === "development") {
+          console.log("Currently Online IDs:", onlineUserIds);
+        }
+        setSignedInUsers(onlineUserIds);
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [session?.user.id]);
 
   return (
     <AuthContext.Provider value={value}>

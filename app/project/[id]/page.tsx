@@ -19,6 +19,8 @@ import {
   Hourglass,
   OctagonX,
   Trash2,
+  User,
+  CheckCircle,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import {
@@ -49,6 +51,8 @@ const page = () => {
     refreshProjectTasks,
     isLoading,
   } = useProjects();
+
+  const { signedInUsers } = useAuth();
 
   const supabase = createClient();
 
@@ -85,8 +89,9 @@ const page = () => {
   ];
 
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
-  const [localProjectTasks, setLocalProjectTasks] =
-    useState<ProjectTaskRow[] | null>(projectTasks);
+  const [localProjectTasks, setLocalProjectTasks] = useState<
+    ProjectTaskRow[] | null
+  >(projectTasks);
   const [localStatusByTaskId, setLocalStatusByTaskId] = useState<
     Record<string, string>
   >({});
@@ -99,6 +104,24 @@ const page = () => {
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const [projectMembersSignedIn, setProjectMembersSignedIn] = useState<
+    string[]
+  >([]);
+
+  useEffect(() => {
+    const projectMemberIds =
+      projectMembers
+        ?.filter((member) => member.project_id === id)
+        .map((member) => member.member_id) || [];
+    if (signedInUsers) {
+      const onlineProjectMemberIds = signedInUsers.filter((userId) =>
+        projectMemberIds.includes(userId),
+      );
+      setProjectMembersSignedIn(onlineProjectMemberIds);
+    }
+    else {      setProjectMembersSignedIn([]);
+    }
+  }, [projectMembers, signedInUsers]);
 
   useEffect(() => {
     setLocalProjectTasks(projectTasks);
@@ -235,7 +258,7 @@ const page = () => {
           {projectMembers?.filter((member) => member.project_id === id)
             .length === 0
             ? "You Are Not A Member Of This Project"
-            : `${projectMembers?.filter((member) => member.project_id === id).length} members`}
+            : `${projectMembers?.filter((member) => member.project_id === id).length} members | ${projectMembersSignedIn.length} users online`}
         </span>
         <div className=" flex flex-wrap gap-2">
           {taskStatuses.map((status, idx) => (
@@ -278,8 +301,8 @@ const page = () => {
               Project Tasks:
             </CardTitle>
           </CardHeader>
-          {localProjectTasks?.filter((task) => task.project_id === id)?.length ===
-            0 && <span>No tasks in this project.</span>}
+          {localProjectTasks?.filter((task) => task.project_id === id)
+            ?.length === 0 && <span>No tasks in this project.</span>}
           {localProjectTasks
             ?.filter((task) => task.project_id === id)
             .sort((a, b) => {
@@ -362,8 +385,7 @@ const page = () => {
                               className="cursor-pointer"
                               onClick={() => handleTaskDelete(task.id)}
                             >
-                              <Trash2
-                              />
+                              <Trash2 />
                             </Button>
                           </CardAction>
                         ) : null}
@@ -458,9 +480,19 @@ const page = () => {
           {projectMembers?.filter((member) => member.project_id === id)
             ?.length === 0 && <span>No members in this project.</span>}
           {projectMembers
-            ?.filter((member) => member.project_id === id)
+            ?.filter((member) => member.project_id === id).sort((a, b) => {
+              const aSignedIn =
+                a.member_id !== null &&
+                projectMembersSignedIn.includes(a.member_id);
+              const bSignedIn =
+                b.member_id !== null &&
+                projectMembersSignedIn.includes(b.member_id);
+              if (aSignedIn && !bSignedIn) return -1;
+              if (!aSignedIn && bSignedIn) return 1;
+              return 0;
+            })
             .map((member) => (
-              <Card key={member.member_id} className=" flex flex-col gap-2 ">
+              <Card key={member.member_id} className={`flex flex-col gap-2 p-2 ${member.member_id !== null && projectMembersSignedIn.includes(member.member_id) ? "bg-green-600/10" : ""}`}>
                 <span className=" font-medium flex items-center gap-2 p-2">
                   <img
                     src={
@@ -472,6 +504,21 @@ const page = () => {
                   />
                   {member.display_name || member.username || "No Name"}
                 </span>
+                <div>
+                  {member.member_id !== null &&
+                  projectMembersSignedIn.includes(member.member_id) ? (
+                    <span className=" text-green-600 p-2 text-sm flex items-center gap-1 ">
+                      <CheckCircle className="w-4 h-4" />
+                      Signed In
+                    </span>
+                  ) : (
+                    <span className=" text-muted-foreground p-2 text-sm flex items-center gap-1 ">
+                      <User className="w-4 h-4" />
+                      Not Signed In
+                    </span>
+                  )}
+
+                </div>
               </Card>
             ))}
         </Card>
