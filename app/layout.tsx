@@ -86,7 +86,7 @@ export default function RootLayout({
                 <SidebarProvider>
                   <AppSidebar />
                   <main className=" bg-background w-full h-screen flex flex-col ">
-                    <SidebarTrigger size={"icon-lg"} />
+                    <SidebarTrigger className=" fixed top-0  bg-background md:bg-transparent " size={"icon-lg"} />
                     {children}
                   </main>
                 </SidebarProvider>

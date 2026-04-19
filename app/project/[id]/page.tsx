@@ -231,8 +231,8 @@ const page = () => {
   }
   return !isLoading &&
     projects?.find((project) => project.project_id === id) === null ? (
-    <Card className="p-45 min-h-fit w-9/10 self-center">
-      <CardTitle className="text-destructive text-2xl ">
+    <Card className="w-full max-w-3xl self-center p-6 sm:p-10">
+      <CardTitle className="text-destructive text-xl sm:text-2xl ">
         Project Not Found
       </CardTitle>
       <CardDescription>
@@ -240,13 +240,13 @@ const page = () => {
       </CardDescription>
     </Card>
   ) : (
-    <div className=" py-10 flex flex-col gap-5 ">
-      <Card className="px-45 min-h-fit py-20 w-9/10 self-center">
-        <CardTitle className=" text-2xl ">
+    <div className="py-6 sm:py-10 px-4 sm:px-6 flex flex-col gap-5">
+      <Card className="w-full max-w-7xl self-center min-h-fit px-5 sm:px-8 lg:px-12 py-7 sm:py-10 lg:py-12">
+        <CardTitle className="text-xl sm:text-2xl break-words">
           Protect Title:{" "}
           {projects?.find((project) => project.project_id === id)?.project_name}
         </CardTitle>
-        <h2 className=" text-lg font-semibold  ">
+        <h2 className="text-base sm:text-lg font-semibold break-words">
           Project Manager:{" "}
           {projects?.find((project) => project.project_id === id)
             ?.manager_display_name ||
@@ -254,13 +254,13 @@ const page = () => {
               ?.manager_username ||
             "No Manager"}
         </h2>
-        <span>
+        <span className="text-sm sm:text-base break-words">
           {projectMembers?.filter((member) => member.project_id === id)
             .length === 0
             ? "You Are Not A Member Of This Project"
             : `${projectMembers?.filter((member) => member.project_id === id).length} members | ${projectMembersSignedIn.length} users online`}
         </span>
-        <div className=" flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-x-3 gap-y-2">
           {taskStatuses.map((status, idx) => (
             <div key={status.key} className=" flex items-center gap-2 ">
               {idx !== 0 && (
@@ -288,9 +288,9 @@ const page = () => {
           ))}
         </div>
       </Card>
-      <div className=" grid grid-cols-6 w-9/10 mt-5 gap-5 self-center">
-        <Card className=" px-10 py-5 col-span-4">
-          <CardHeader className="p-0">
+      <div className="grid grid-cols-1 xl:grid-cols-6 w-full max-w-7xl mt-5 gap-5 self-center">
+        <Card className="px-4 sm:px-6 lg:px-8 py-5 xl:col-span-4">
+          <CardHeader className="p-0 flex-row items-start justify-between gap-3">
             {projects?.filter((member) => member.project_id === id)[0]
               .manager_username === profile?.username ? (
               <CardAction>
@@ -354,9 +354,9 @@ const page = () => {
 
                   return (
                     <>
-                      <CardHeader className="p-0 flex-row items-start justify-between ">
+                      <CardHeader className="p-0 flex-col sm:flex-row items-start sm:items-center justify-between gap-2 ">
                         <CardTitle
-                          className={`flex gap-1 justify-start items-center`}
+                          className={`flex gap-1 justify-start items-center break-words`}
                         >
                           <span
                             className={`  ${taskStatus === "pending" ? "text-yellow-600" : taskStatus === "in_progress" ? "text-blue-700" : taskStatus === "completed" ? "text-green-600" : taskStatus === "cancelled" ? "text-red-600" : ""}`}
@@ -378,7 +378,7 @@ const page = () => {
                         {projects?.filter(
                           (member) => member.project_id === id,
                         )[0].manager_username === profile?.username ? (
-                          <CardAction>
+                          <CardAction className="self-end sm:self-auto">
                             <Button
                               variant={"destructive"}
                               size={"icon-lg"}
@@ -465,8 +465,8 @@ const page = () => {
               </Card>
             ))}
         </Card>
-        <Card className=" px-10 py-5 col-span-2">
-          <CardHeader className="p-0">
+        <Card className="px-4 sm:px-6 lg:px-8 py-5 xl:col-span-2">
+          <CardHeader className="p-0 flex-row items-start justify-between gap-3">
             {projects?.filter((member) => member.project_id === id)[0]
               .manager_username === profile?.username ? (
               <CardAction>
@@ -493,7 +493,7 @@ const page = () => {
             })
             .map((member) => (
               <Card key={member.member_id} className={`flex flex-col gap-2 p-2 ${member.member_id !== null && projectMembersSignedIn.includes(member.member_id) ? "bg-green-600/10" : ""}`}>
-                <span className=" font-medium flex items-center gap-2 p-2">
+                <span className="font-medium flex items-center gap-2 p-2 min-w-0 break-words">
                   <img
                     src={
                       member.avatar_url ||
@@ -504,7 +504,7 @@ const page = () => {
                   />
                   {member.display_name || member.username || "No Name"}
                 </span>
-                <div>
+                <div className="min-w-0">
                   {member.member_id !== null &&
                   projectMembersSignedIn.includes(member.member_id) ? (
                     <span className=" text-green-600 p-2 text-sm flex items-center gap-1 ">
