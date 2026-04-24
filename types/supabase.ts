@@ -39,6 +39,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      conversations: {
+        Row: {
+          id: string
+          last_message_at: string | null
+          user_1: string | null
+          user_2: string | null
+        }
+        Insert: {
+          id?: string
+          last_message_at?: string | null
+          user_1?: string | null
+          user_2?: string | null
+        }
+        Update: {
+          id?: string
+          last_message_at?: string | null
+          user_1?: string | null
+          user_2?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_user_1_fkey"
+            columns: ["user_1"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user_1_fkey"
+            columns: ["user_1"]
+            isOneToOne: false
+            referencedRelation: "project_member_details"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "conversations_user_2_fkey"
+            columns: ["user_2"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user_2_fkey"
+            columns: ["user_2"]
+            isOneToOne: false
+            referencedRelation: "project_member_details"
+            referencedColumns: ["member_id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          edited: boolean | null
+          id: number
+          is_read: boolean | null
+          sender_id: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          edited?: boolean | null
+          id?: never
+          is_read?: boolean | null
+          sender_id?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          edited?: boolean | null
+          id?: never
+          is_read?: boolean | null
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "project_member_details"
+            referencedColumns: ["member_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

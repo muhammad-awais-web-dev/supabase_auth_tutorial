@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/providers/auth-provider";
 import { ProjectsProvider } from "@/providers/project-provider";
+import { ChatProvider } from "@/providers/chat-provider";
 
 const outfitHeading = Outfit({
   subsets: ["latin"],
@@ -85,10 +86,15 @@ export default function RootLayout({
               <TooltipProvider delayDuration={0}>
                 <SidebarProvider>
                   <AppSidebar />
-                  <main className=" bg-background w-full h-screen flex flex-col ">
-                    <SidebarTrigger className=" fixed top-0  bg-background md:bg-transparent " size={"icon-lg"} />
-                    {children}
-                  </main>
+                  <ChatProvider>
+                    <main className=" bg-background w-full h-screen flex flex-col ">
+                      <SidebarTrigger
+                        className=" fixed top-0  bg-background md:bg-transparent "
+                        size={"icon-lg"}
+                      />
+                      {children}
+                    </main>
+                  </ChatProvider>
                 </SidebarProvider>
               </TooltipProvider>
             </ThemeProvider>
