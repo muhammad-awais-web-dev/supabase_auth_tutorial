@@ -7,8 +7,9 @@ import { useChat } from "@/providers/chat-provider";
 import { Database } from "@/types/database.types";
 import { Card, CardAction } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusSquare } from "lucide-react";
+import { PlusSquare, Send } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import ChatWindow from "./components/ChatWindow";
 
 const page = () => {
   const { signedInUsers, profile } = useAuth();
@@ -33,12 +34,14 @@ const page = () => {
   const { isLoading } = useAuth();
   const { conversations, createConversation } = useChat();
   const [isCreating, setIsCreating] = useState<string[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
 
   const addConversation = (id: string) => {
     setIsCreating((prev) => [...prev, id]);
     createConversation(id).finally(() => {
       setTimeout(() => {
         setIsCreating((prev) => prev.filter((convId) => convId !== id));
+        setSelectedConversation(id);
       }, 300);
     });
   };
@@ -50,6 +53,7 @@ const page = () => {
   return (<div className="flex flex-row">
     <div className=" flex flex-col h-screen overflow-auto w-1/3 items-start justify-start p-10 ">
     <div className=" min-h-fit w-full" >
+      
 
       <h2>Conversations</h2>
       <Card className="w-full p-4 my-10">
@@ -66,7 +70,8 @@ const page = () => {
             return (
               <Card
                 key={user.id}
-                className=" p-4 flex flex-row items-center gap-4 mb-1 "
+                className=" p-4 flex flex-row items-center gap-4 mb-1 hover:bg-foreground/20 transition-colors duration-300 cursor-pointer "
+                onClick={() => setSelectedConversation(conv.id)}
               >
                 <div className=" h-10 w-10 overflow-hidden rounded-full ">
                   <img
@@ -117,8 +122,8 @@ const page = () => {
               <p>{user.display_name}</p>
               <Button
                 disabled={isCreating.includes(user.id)}
-                variant="outline"
-                className=" ml-auto "
+                variant="secondary"
+                className=" ml-auto hover:bg-primary/30 cursor-pointer "
                 onClick={() => addConversation(user.id)}
               >
                 Start Conversation 
@@ -129,15 +134,7 @@ const page = () => {
       </Card>
     </div>
     </div>
-    <div className=" relative flex flex-col h-screen w-2/3 items-start justify-center p-10 overflow-hidden " >
-          <div
-            className=" absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none "
-            style={{ backgroundImage: "url('/chat-bg.webp')" }}
-          />
-          <Card className=" relative z-10 w-full h-full bg-transparent backdrop-blur-sm p-10 " >
-            Hello
-          </Card>
-    </div>
+    <ChatWindow selectedConversation={selectedConversation} />
   </div>
   );
 };
