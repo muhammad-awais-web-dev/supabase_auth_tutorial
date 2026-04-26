@@ -61,7 +61,16 @@ const page = () => {
           .filter(
             (conv) =>
               conv.user_1 === profile?.id || conv.user_2 === profile?.id,
-          )
+          ).sort((a, b) => {
+              const aLastMsg = a.last_message_at
+                ? new Date(a.last_message_at).getTime()
+                : 0;
+              const bLastMsg = b.last_message_at
+                ? new Date(b.last_message_at).getTime()
+                : 0;
+
+            return bLastMsg - aLastMsg;
+          })
           .map((conv) => {
             const otherUser =
               conv.user_1 === profile?.id ? conv.user_2 : conv.user_1;
