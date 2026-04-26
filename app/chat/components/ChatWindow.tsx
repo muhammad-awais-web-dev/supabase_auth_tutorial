@@ -1,8 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import React, { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import { Database } from "@/types/supabase";
 import { useChat } from "@/providers/chat-provider";
 
 import { Card } from "@/components/ui/card";
@@ -17,7 +15,6 @@ const ChatWindow = ({
 }: {
   selectedConversation: string | null;
 }) => {
-  const supabase = createClient();
   const { session } = useAuth();
   const { messages, sendMessage : sendMessageFromContext } = useChat();
   // const [messages, setMessages] = useState<Database["public"]["Tables"]["messages"]["Row"][]>([]);

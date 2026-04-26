@@ -38,7 +38,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (error) {
           console.error("Error fetching conversations:", error);
         } else {
-          console.log("Fetched conversations:", data);
           setConversations(data);
         }
       };
@@ -77,11 +76,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           }
         }
       )
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") {
-          console.log("Subscribed to conversations channel");
-        }
-      });
+      .subscribe()
 
   }, [session]);
 
@@ -148,11 +143,7 @@ useEffect(() => {
         }
       },
     )
-    .subscribe((status) => {
-      if (status === "SUBSCRIBED") {
-        console.log("Subscribed to messages channel");
-      }
-    });
+    .subscribe();
 
   return () => {
     supabase.removeChannel(chatChannel);
