@@ -89,7 +89,7 @@ export default function RootLayout({
                   <ChatProvider>
                     <main className=" bg-background w-full h-screen flex flex-col ">
                       <SidebarTrigger
-                        className=" fixed top-0  bg-background md:bg-transparent "
+                        className=" fixed top-0 z-90 bg-background md:bg-transparent "
                         size={"icon-lg"}
                       />
                       {children}

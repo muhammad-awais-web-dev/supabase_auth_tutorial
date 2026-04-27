@@ -46,6 +46,7 @@ type AuthContextValue = {
   signUpWithPassword: (
     email: string,
     password: string,
+    emailRedirectTo?: string,
   ) => ReturnType<typeof supabase.auth.signUp>;
   signOut: () => Promise<void>;
   signedInUsers?: string[]; // Array of online user IDs
@@ -121,9 +122,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return supabase.auth.signInWithPassword({ email, password });
   }, []);
 
-  const signUpWithPassword = useCallback((email: string, password: string) => {
-    return supabase.auth.signUp({ email, password });
-  }, []);
+  const signUpWithPassword = useCallback(
+    (email: string, password: string, emailRedirectTo?: string) => {
+      return supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          ...(emailRedirectTo ? { emailRedirectTo } : {}),
+        },
+      });
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();

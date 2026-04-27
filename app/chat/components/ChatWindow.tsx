@@ -5,15 +5,17 @@ import { useChat } from "@/providers/chat-provider";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { ArrowLeftIcon, Send } from "lucide-react";
 import { SentBubble, ReceivedBubble } from "./Bubbles";
 import { AutoTextarea } from "@/components/ui/textarea";
 
 
 const ChatWindow = ({
   selectedConversation,
+  setSelectedConversation,
 }: {
   selectedConversation: string | null;
+  setSelectedConversation: (id: string | null) => void;
 }) => {
   const { session } = useAuth();
   const { messages, sendMessage : sendMessageFromContext } = useChat();
@@ -40,13 +42,18 @@ const ChatWindow = ({
   };
 
   return (
-    <div className=" relative flex flex-col h-screen w-2/3 items-start justify-center p-10 overflow-hidden ">
+    <div className={`relative flex flex-col h-screen min-w-full lg:min-w-[calc(100%-32rem)] items-start justify-center p-10 overflow-hidden ${selectedConversation ? "-translate-x-full lg:translate-x-0" : "translate-x-0"} transition-transform duration-300 ease-in-out `} >
       <div
         className=" absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none "
         style={{ backgroundImage: "url('/chat-bg.webp')" }}
       />
       {selectedConversation ? (
-        <Card className=" relative z-10 w-full flex flex-col h-full bg-transparent backdrop-blur-sm p-5 ">
+        <>
+      <Button variant="default" size={"lg"} className=" absolute top-5 left-10 z-20 cursor-pointer" onClick={() => setSelectedConversation(null)} >
+        <ArrowLeftIcon />
+        Back
+      </Button>
+        <Card className=" mt-5 relative z-10 w-full flex flex-col h-full bg-transparent backdrop-blur-sm p-5 ">
           <div className=" text-2xl h-full font-bold flex flex-col justify-end text-gray-700 ">
             {/* Messages : {selectedConversation} */}
             {messages.filter((msg) => msg.conversation_id === selectedConversation).map((msg) =>
@@ -76,6 +83,7 @@ const ChatWindow = ({
             </Button>
           </div>
         </Card>
+        </>
       ) : null}
     </div>
   );

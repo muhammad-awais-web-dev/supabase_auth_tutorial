@@ -35,6 +35,8 @@ const SignUpDialog = () => {
   const [showSignUpMessage, setShowSignUpMessage] = useState<{
     type: "success" | "error";
   } | null>(null);
+  const emailRedirectTo =
+    process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
 
   useEffect(() => {
     if (emailValid) {
@@ -81,7 +83,11 @@ const SignUpDialog = () => {
   const handleSignUp = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email && password) {
-      const { data, error } = await signUpWithPassword(email, password);
+      const { data, error } = await signUpWithPassword(
+        email,
+        password,
+        emailRedirectTo,
+      );
       if (error) {
         setShowSignUpMessage({ type: "error" });
       } else {

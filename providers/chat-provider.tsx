@@ -14,6 +14,7 @@ type ChatContextValue = {
   createConversation: (otherUserId: string) => Promise<Database["public"]["Tables"]["conversations"]["Row"] | undefined>;
   messages: Database["public"]["Tables"]["messages"]["Row"][];
   sendMessage: (conversationId: string, content: string) => Promise<void>;
+  markRead: (conversationId: string) => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
@@ -167,13 +168,29 @@ useEffect(() => {
     }
   }
 
+  const markRead = async (conversationId: string) => {
+    if (!session) return;
+    const { data, error } = await supabase
+      .from('messages')
+      .update({ is_read: true })
+      .eq('conversation_id', conversationId)
+      .neq('sender_id', session.user.id)
+      .select();
+    if (error) {
+      console.error("Error marking messages as read:", error);
+    }
+    else {
+      console.log(data)
+    }
+  }
 
   const chatValue: ChatContextValue = {
     conversations,
     conversationsLoading,
     createConversation,
     messages,
-    sendMessage
+    sendMessage,
+    markRead
   };
 
   return (
