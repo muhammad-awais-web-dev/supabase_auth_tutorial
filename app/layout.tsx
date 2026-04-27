@@ -87,7 +87,7 @@ export default function RootLayout({
                 <SidebarProvider>
                   <AppSidebar />
                   <ChatProvider>
-                    <main className=" bg-background w-full h-screen flex flex-col ">
+                    <main className=" bg-background flex-1 min-w-0 h-screen flex flex-col ">
                       <SidebarTrigger
                         className=" fixed top-0 z-90 bg-background md:bg-transparent "
                         size={"icon-lg"}
