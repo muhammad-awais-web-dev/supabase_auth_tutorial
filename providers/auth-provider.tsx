@@ -11,7 +11,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
-import type { Tables } from "@/types/database.types";
+import type { Tables } from "@/types/supabase";
 import {
   Dialog,
   DialogContent,

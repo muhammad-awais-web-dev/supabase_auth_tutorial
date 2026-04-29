@@ -9,7 +9,6 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 
-import { Database } from "@/types/database.types";
 import { Button } from "../ui/button";
 
 import createUsers  from "./createUsers";

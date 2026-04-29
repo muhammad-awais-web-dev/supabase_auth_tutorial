@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatBubble } from "./chat-bubble";
 import { ChatComposer } from "./chat-composer";
-import type { Database } from "@/types/database.types";
+import type { Database } from "@/types/supabase";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type MessageRow = Database["public"]["Tables"]["messages"]["Row"];
@@ -35,7 +35,7 @@ export function ConversationStage({
 }: {
   selectedConversation: string | null;
   selectedUser: ProfileRow | null;
-  selectedUserOnline: boolean;
+  selectedUserOnline: boolean | undefined;
   messages: MessageRow[];
   profileId?: string;
   input: string;

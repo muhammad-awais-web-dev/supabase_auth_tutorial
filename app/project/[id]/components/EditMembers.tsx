@@ -14,7 +14,7 @@ import { useParams } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/client";
 
-import { Database } from "@/types/database.types";
+import { Database } from "@/types/supabase";
 
 import { useProjects } from "@/providers/project-provider";
 import { Card, CardAction, CardHeader, CardTitle } from "@/components/ui/card";

@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/providers/auth-provider";
 import { useChat } from "@/providers/chat-provider";
-import type { Database } from "@/types/database.types";
+import type { Database } from "@/types/supabase";
 import { Spinner } from "@/components/ui/spinner";
 import { ConversationList } from "./components/conversation-list";
 import { ConversationStage } from "./components/conversation-stage";

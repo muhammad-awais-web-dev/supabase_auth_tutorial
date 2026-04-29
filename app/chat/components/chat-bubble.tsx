@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { Database } from "@/types/database.types";
+import type { Database } from "@/types/supabase";
 
 type MessageRow = Database["public"]["Tables"]["messages"]["Row"];
 
